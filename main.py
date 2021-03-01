@@ -24,7 +24,7 @@ def checkStreak(user):
 
     return "OK" if ok else "!OK"
 
-numOfQues = 10
+numOfQues = 2
 users = os.getenv("user").split("/")
 usersEmail = os.getenv("userEmail").split("/")
 port = 465  # For SSL
@@ -49,23 +49,29 @@ This message is sent from Python."""
 start = time()
 # Create a secure SSL context
 context = ssl.create_default_context()
+day = 60 * 60 * 24
+start = start - 60 * 60 * 2 # this lets the script run once when it is executed.
 
 while 1:
-    cur = time()
-    if cur - start > 10:
-        with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
-            server.login(email, password)
-            i = 0
-            for user in users:
-                res = checkStreak(user)
-                if user == "bufftowel":
-                    res = "!OK"
-                if res == "OK":
-                    print(user + "'s " + "Streak Saved")
-                elif res == "!OK":
-                    server.sendmail(email, usersEmail[i], message)
-                else:
-                    server.sendmail(email, usersEmail[0], errMsg)
-                i += 1
-        start = cur
+    if time() - start > 60 * 60 * 2:     # This condition lets this if run once every 2 hrs 
+        cur = time() + 60 * 60 * 11 / 2  # adding 5:30 hrs to convert UTC to IST
+        cur = int(cur % day)             # extracting seconds elapsed from this day
+        if cur > 60 * 60 * 18:           # checking if its over 6pm or not                    
+            with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
+                server.login(email, password)
+                i = 0
+                for user in users:
+                    res = checkStreak(user)
+                    if res == "OK":
+                        print(user + "'s " + "streak is saved")
+                    elif res == "!OK":
+                        print(user + "'s " + "streak is in danger!")
+                        server.sendmail(email, usersEmail[i], message)
+                    else:
+                        server.sendmail(email, usersEmail[0], errMsg)
+                    i += 1
+        else:
+            print ("Not time yet!")
+        start = time()
+
         
