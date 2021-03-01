@@ -1,5 +1,6 @@
 import os
 import json
+from time import time
 import requests
 import smtplib, ssl
 from dotenv import load_dotenv
@@ -45,19 +46,26 @@ with the api, please look into this.
 
 This message is sent from Python."""
 
+start = time()
 # Create a secure SSL context
 context = ssl.create_default_context()
 
-with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
-    server.login(email, password)
-    i = 0
-    for user in users:
-        res = checkStreak(user)
-        if res == "OK":
-            print(user + "'s " + "Streak Saved")
-        elif res == "!OK":
-            server.sendmail(email, usersEmail[i], message)
-        else:
-            server.sendmail(email, usersEmail[0], errMsg)
-        i += 1
+while 1:
+    cur = time()
+    if cur - start > 10:
+        with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
+            server.login(email, password)
+            i = 0
+            for user in users:
+                res = checkStreak(user)
+                if user == "bufftowel":
+                    res = "!OK"
+                if res == "OK":
+                    print(user + "'s " + "Streak Saved")
+                elif res == "!OK":
+                    server.sendmail(email, usersEmail[i], message)
+                else:
+                    server.sendmail(email, usersEmail[0], errMsg)
+                i += 1
+        start = cur
         
