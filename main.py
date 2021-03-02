@@ -130,7 +130,7 @@ Subject: Yesterday's Streak Report.
 
 with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
     server.login(email, password)
-    print("Loggeg in!")
+    print("Logged in!")
     main(server)
 
 
