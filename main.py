@@ -56,7 +56,7 @@ letItTHrough = True
 reportMail = True
 
 while 1:
-    if (time() + 60 * 30) % twoHrs < 25 and letItTHrough: # This condition lets this if run once every 2 hrs (runs at 6:00, 8:00...) 
+    if (time() + 60 * 30) % twoHrs < 25 and letItTHrough:           # This condition lets this if run once every 2 hrs (runs at 7:00, 9:00...) 
         cur = time() + 60 * 30 * 11                                 # adding 5:30 hrs to convert UTC to IST
         cur = int(cur % day)                                        # extracting seconds elapsed from this day
         if cur > 60 * 60 * 18:                                      # checking if its over 6pm or not                    
@@ -88,13 +88,18 @@ while 1:
 
 # Report Mailing System
 
-    if (time() + 60 * 30 * 11) % day < 60 * 5 + 25 and reportMail:
+    if (time() + 60 * 30 * 11) % day > day - 30 and reportMail:
         i = 0
         msg = """\
 Subject: Yesterday's Streak Report.
 
 """
         for user in users:
+            res = checkStreak(user)
+            if res == "OK":
+                isStreakBroken[i] = False
+            elif res == "!OK":
+                isStreakBroken[i] = True
             msg = msg + "{}'s Streak was {}\n".format(user, "Broken" if isStreakBroken[i] else "Alive")
             i = i + 1
 
@@ -105,7 +110,7 @@ Subject: Yesterday's Streak Report.
                 server.sendmail(email, usersEmail[i], msg)
                 i = i + 1
         reportMail = False
-    elif (time() + 60 * 30 * 11) % day > 60 * 5 + 25:
+    elif (time() + 60 * 30 * 11) % day < day - 30:
         reportMail = True
 
         
