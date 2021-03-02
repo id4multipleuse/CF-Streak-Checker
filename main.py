@@ -56,10 +56,10 @@ letItTHrough = True
 reportMail = True
 
 while 1:
-    if (time() - 60 * 60) % twoHrs < 25 and letItTHrough:   # This condition lets this if run once every 2 hrs (runs at 6:30, 8:30...) 
-        cur = time() + 60 * 30 * 11                         # adding 5:30 hrs to convert UTC to IST
-        cur = int(cur % day)                                # extracting seconds elapsed from this day
-        if cur > 60 * 60 * 18:                              # checking if its over 6pm or not                    
+    if (time() + 60 * 30) % twoHrs < 25 and letItTHrough: # This condition lets this if run once every 2 hrs (runs at 6:00, 8:00...) 
+        cur = time() + 60 * 30 * 11                                 # adding 5:30 hrs to convert UTC to IST
+        cur = int(cur % day)                                        # extracting seconds elapsed from this day
+        if cur > 60 * 60 * 18:                                      # checking if its over 6pm or not                    
             with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
                 server.login(email, password)
                 i = 0
@@ -81,14 +81,14 @@ while 1:
         else:
             print ("Not time yet!")
 
-    if (time() - 60 * 60) % twoHrs < 25:
+    if (time() + 60 * 30) % twoHrs < 25:
         letItTHrough = False
-    if (time() - 60 * 60) % twoHrs > 25:
+    if (time() + 60 * 30) % twoHrs > 25:
         letItTHrough = True
 
 # Report Mailing System
 
-    if (time() + 60 * 30 * 11) % day < 25 and reportMail:
+    if (time() + 60 * 30 * 11) % day < 60 * 5 + 25 and reportMail:
         i = 0
         msg = """\
 Subject: Yesterday's Streak Report.
@@ -105,7 +105,7 @@ Subject: Yesterday's Streak Report.
                 server.sendmail(email, usersEmail[i], msg)
                 i = i + 1
         reportMail = False
-    elif (time() + 60 * 30 * 11) % day > 25:
+    elif (time() + 60 * 30 * 11) % day > 60 * 5 + 25:
         reportMail = True
 
         
