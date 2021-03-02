@@ -68,23 +68,21 @@ def main(server):
             cur = time() + 60 * 30 * 11                                 # adding 5:30 hrs to convert UTC to IST
             cur = int(cur % day)                                        # extracting seconds elapsed from this day
             if cur > 60 * 60 * 18:                                      # checking if its over 6pm or not                    
-                with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
-                    server.login(email, password)
-                    i = 0
-                    for user in users:
-                        res = checkStreak(user)
-                        if res == "OK":
-                            print(user + "'s " + "streak is saved")
-                        elif res == "!OK":
-                            print(user + "'s " + "streak is in danger!")
-                            server.sendmail(email, usersEmail[i], message)
-                        else:
-                            server.sendmail(email, usersEmail[0], errMsg)
-                        if res == "OK":
-                            isStreakBroken[i] = False
-                        elif res == "!OK":
-                            isStreakBroken[i] = True
-                        i += 1
+                i = 0
+                for user in users:
+                    res = checkStreak(user)
+                    if res == "OK":
+                        print(user + "'s " + "streak is saved")
+                    elif res == "!OK":
+                        print(user + "'s " + "streak is in danger!")
+                        server.sendmail(email, usersEmail[i], message)
+                    else:
+                        server.sendmail(email, usersEmail[0], errMsg)
+                    if res == "OK":
+                        isStreakBroken[i] = False
+                    elif res == "!OK":
+                        isStreakBroken[i] = True
+                    i += 1
                         
             else:
                 print ("Not time yet!")
