@@ -19,12 +19,12 @@ def checkStreak(user):
 
     ok = False
     for problem in problems:
-        if(problem["verdict"] == "OK" and problem["problem"]["rating"] >= 1700):
+        if(problem["verdict"] == "OK" and problem["problem"]["rating"] >= 1700) and  problem["creationTimeSeconds"] - (time() - time() % day) >= 0:
             ok = True
 
     return "OK" if ok else "!OK"
 
-numOfQues = 2
+numOfQues = 50
 users = os.getenv("user").split("/")
 usersEmail = os.getenv("userEmail").split("/")
 port = 465  # For SSL
