@@ -22,7 +22,14 @@ def checkStreak(user):
 
     ok = False
     for problem in problems:
-        if(problem["verdict"] == "OK" and problem["problem"]["rating"] >= 1700) and  problem["creationTimeSeconds"] - (time() - time() % day) >= 0:
+        flag = False
+        try:
+            if problem["problem"]["rating"] >= 1700:
+                flag = True
+        except:
+            if problem["problem"]["index"] > "C":
+                flag = True
+        if problem["verdict"] == "OK" and  flag and  problem["creationTimeSeconds"] - (time() - time() % day) >= 0:
             ok = True
 
     return "OK" if ok else "!OK"
