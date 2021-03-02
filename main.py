@@ -30,6 +30,8 @@ usersEmail = os.getenv("userEmail").split("/")
 port = 465  # For SSL
 email = os.getenv("email")
 password = os.getenv("pass")
+n = len(users)
+isStreakBroken = [False] * n
 
 message = """\
 Subject: Your Streak is in danger!
@@ -46,17 +48,18 @@ with the api, please look into this.
 
 This message is sent from Python."""
 
-start = time()
 # Create a secure SSL context
 context = ssl.create_default_context()
 day = 60 * 60 * 24
-start = start - 60 * 60 * 2 # this lets the script run once when it is executed.
+twoHrs = 60 * 60 * 2
+letItTHrough = True
+reportMail = True
 
 while 1:
-    if time() - start > 60 * 60 * 2:     # This condition lets this if run once every 2 hrs 
-        cur = time() + 60 * 60 * 11 / 2  # adding 5:30 hrs to convert UTC to IST
-        cur = int(cur % day)             # extracting seconds elapsed from this day
-        if cur > 60 * 60 * 18:           # checking if its over 6pm or not                    
+    if (time() - 60 * 60) % twoHrs < 25 and letItTHrough:   # This condition lets this if run once every 2 hrs (runs at 6:30, 8:30...) 
+        cur = time() + 60 * 30 * 11                         # adding 5:30 hrs to convert UTC to IST
+        cur = int(cur % day)                                # extracting seconds elapsed from this day
+        if cur > 60 * 60 * 18:                              # checking if its over 6pm or not                    
             with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
                 server.login(email, password)
                 i = 0
@@ -69,9 +72,40 @@ while 1:
                         server.sendmail(email, usersEmail[i], message)
                     else:
                         server.sendmail(email, usersEmail[0], errMsg)
+                    if res == "OK":
+                        isStreakBroken[i] = False
+                    elif res == "!OK":
+                        isStreakBroken[i] = True
                     i += 1
+                    
         else:
             print ("Not time yet!")
-        start = time()
+
+    if (time() - 60 * 60) % twoHrs < 25:
+        letItTHrough = False
+    if (time() - 60 * 60) % twoHrs > 25:
+        letItTHrough = True
+
+# Report Mailing System
+
+    if (time() + 60 * 30 * 11) % day < 25 and reportMail:
+        i = 0
+        msg = """\
+Subject: Yesterday's Streak Report.
+
+"""
+        for user in users:
+            msg = msg + "{}'s Streak was {}\n".format(user, "Broken" if isStreakBroken[i] else "Alive")
+            i = i + 1
+
+        i = 0
+        with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
+            server.login(email, password)
+            for user in users:
+                server.sendmail(email, usersEmail[i], msg)
+                i = i + 1
+        reportMail = False
+    elif (time() + 60 * 30 * 11) % day > 25:
+        reportMail = True
 
         
