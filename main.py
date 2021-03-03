@@ -92,6 +92,7 @@ def main():
                         elif res == "!OK":
                             isStreakBroken[i] = True
                         i += 1
+                    server.quit()
                         
             else:
                 print ("Not time yet!")
@@ -126,13 +127,17 @@ Subject: Yesterday's Streak Report.
                     server.sendmail(email, usersEmail[i], msg)
                     i = i   + 1
                     reportMail = False
+                server.quit()
         elif (time() + 60 * 30 * 11) % day < day - 30:
             reportMail = True
 
 # Putting everything in main so that we only need to log in once.
 # https://accounts.google.com/DisplayUnlockCaptcha : use this link to clear captcha when you start the script.
 
-print("Started!")
+with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
+    server.login(email, password)
+    print("Started!")
+    server.quit()
 main()
 
 
