@@ -57,7 +57,7 @@ This message is sent from Python."""
 # Create a secure SSL context
 context = ssl.create_default_context()
 
-def main(server):
+def main():
     
     global message, errMsg
     day = 60 * 60 * 24
@@ -76,20 +76,22 @@ def main(server):
             cur = int(cur % day)                                        # extracting seconds elapsed from this day
             if cur > 60 * 60 * 18:                                      # checking if its over 6pm or not                    
                 i = 0
-                for user in users:
-                    res = checkStreak(user)
-                    if res == "OK":
-                        print(user + "'s " + "streak is saved")
-                    elif res == "!OK":
-                        print(user + "'s " + "streak is in danger!")
-                        server.sendmail(email, usersEmail[i], message)
-                    else:
-                        server.sendmail(email, usersEmail[0], errMsg)
-                    if res == "OK":
-                        isStreakBroken[i] = False
-                    elif res == "!OK":
-                        isStreakBroken[i] = True
-                    i += 1
+                with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
+                    server.login(email, password)
+                    for user in users:
+                        res = checkStreak(user)
+                        if res == "OK":
+                            print(user + "'s " + "streak is saved")
+                        elif res == "!OK":
+                            print(user + "'s " + "streak is in danger!")
+                            server.sendmail(email, usersEmail[i], message)
+                        else:
+                            server.sendmail(email, usersEmail[0], errMsg)
+                        if res == "OK":
+                            isStreakBroken[i] = False
+                        elif res == "!OK":
+                            isStreakBroken[i] = True
+                        i += 1
                         
             else:
                 print ("Not time yet!")
@@ -118,20 +120,20 @@ Subject: Yesterday's Streak Report.
 
                 i = 0
 
-            for user in users:
-                server.sendmail(email, usersEmail[i], msg)
-                i = i   + 1
-                reportMail = False
+            with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
+                server.login(email, password)
+                for user in users:
+                    server.sendmail(email, usersEmail[i], msg)
+                    i = i   + 1
+                    reportMail = False
         elif (time() + 60 * 30 * 11) % day < day - 30:
             reportMail = True
 
 # Putting everything in main so that we only need to log in once.
 # https://accounts.google.com/DisplayUnlockCaptcha : use this link to clear captcha when you start the script.
 
-with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
-    server.login(email, password)
-    print("Logged in!")
-    main(server)
+print("Started!")
+main()
 
 
 
