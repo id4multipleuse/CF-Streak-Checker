@@ -109,7 +109,7 @@ def main():
             msg = """\
 Subject: Yesterday's Streak Report.
 
-    """
+"""
             for user in users:
                 res = checkStreak(user)
                 if res == "OK":
