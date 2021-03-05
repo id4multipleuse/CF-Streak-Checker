@@ -29,7 +29,7 @@ def checkStreak(user):
         except:
             if problem["problem"]["index"] >= "C":
                 flag = True
-        if problem["verdict"] == "OK" and  flag and  problem["creationTimeSeconds"] - (time() - time() % day) >= 0:
+        if problem["verdict"] == "OK" and  flag and  problem["creationTimeSeconds"] - (time() - time() % day + day) >= 0:
             ok = True
 
     return "OK" if ok else "!OK"
@@ -114,7 +114,7 @@ def main():
 
 # Report Mailing System
 
-        if (time() + 60 * 30 * 11) % day < day - 30 and reportMail:
+        if (time() + 60 * 30 * 11) % day > day - 30 and reportMail:
             print("Current Time: " + UTCtoIST() + ", Sending reports for today.")
             i = 0
             msg = """\
@@ -136,10 +136,10 @@ Subject: Yesterday's Streak Report.
                 server.login(email, password)
                 for user in users:
                     server.sendmail(email, usersEmail[i], msg)
-                    i = i   + 1
+                    i = i + 1
                     reportMail = False
                 server.quit()
-        elif (time() + 60 * 30 * 11) % day > day - 30:
+        elif (time() + 60 * 30 * 11) % day < day - 30:
             reportMail = True
 
 # Putting everything in main so that we only need to log in once.
