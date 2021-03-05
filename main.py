@@ -114,7 +114,7 @@ def main():
 
 # Report Mailing System
 
-        if (time() + 60 * 30 * 11) % day > day - 30 and reportMail:
+        if (time() + 60 * 30 * 11) % day < day - 30 and reportMail:
             print("Current Time: " + UTCtoIST() + ", Sending reports for today.")
             i = 0
             msg = """\
@@ -139,7 +139,7 @@ Subject: Yesterday's Streak Report.
                     i = i + 1
                     reportMail = False
                 server.quit()
-        elif (time() + 60 * 30 * 11) % day < day - 30:
+        elif (time() + 60 * 30 * 11) % day > day - 30:
             reportMail = True
 
 # Putting everything in main so that we only need to log in once.
