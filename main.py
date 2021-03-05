@@ -57,9 +57,16 @@ This message is sent from Python."""
 # Create a secure SSL context
 context = ssl.create_default_context()
 
+def UTCtoIST():
+    day = 60 * 60 * 24
+    curr = (time() + 60 * 30 * 11) % day
+    hour = int(curr // 3600)
+    minutes = int((curr % 3600) // 60)
+    return str(hour) + ":" + str(minutes) + " IST"
+
 def main():
     
-    global message, errMsg
+    global message, errMsg, password, port
     day = 60 * 60 * 24
     twoHrs = 60 * 60 * 2
     letItTHrough = True
@@ -71,10 +78,13 @@ def main():
     isStreakBroken = [False] * n
 
     while 1:
+
         if (time() + 60 * 30) % twoHrs < 25 and letItTHrough:           # This condition lets this if run once every 2 hrs (runs at 7:00, 9:00...) 
             cur = time() + 60 * 30 * 11                                 # adding 5:30 hrs to convert UTC to IST
             cur = int(cur % day)                                        # extracting seconds elapsed from this day
             if cur > 60 * 60 * 18:                                      # checking if its over 6pm or not                    
+                print ("Current Time: " + UTCtoIST() + ", Over 6pm...")
+                print("Checking status and sending out mails accordingly.")
                 i = 0
                 with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
                     server.login(email, password)
@@ -95,7 +105,7 @@ def main():
                     server.quit()
                         
             else:
-                print ("Not time yet!")
+                print ("Current Time: " + UTCtoIST() + ", Not time yet!")
 
         if (time() + 60 * 30) % twoHrs < 25:
             letItTHrough = False
@@ -105,6 +115,7 @@ def main():
 # Report Mailing System
 
         if (time() + 60 * 30 * 11) % day > day - 30 and reportMail:
+            print("Current Time: " + UTCtoIST + ", Sending reports for today.")
             i = 0
             msg = """\
 Subject: Yesterday's Streak Report.
@@ -136,7 +147,7 @@ Subject: Yesterday's Streak Report.
 
 with smtplib.SMTP_SSL("smtp.gmail.com", port, context=context) as server:
     server.login(email, password)
-    print("Started!")
+    print("Current Time: " + UTCtoIST() + ", Started!")
     server.quit()
 main()
 
