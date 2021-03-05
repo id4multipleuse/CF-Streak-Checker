@@ -29,7 +29,7 @@ def checkStreak(user):
         except:
             if problem["problem"]["index"] >= "C":
                 flag = True
-        if problem["verdict"] == "OK" and  flag and  problem["creationTimeSeconds"] - (time() - time() % day + day) >= 0:
+        if problem["verdict"] == "OK" and  flag and  problem["creationTimeSeconds"] + day - (time() - time() % day) >= 0:
             ok = True
 
     return "OK" if ok else "!OK"
